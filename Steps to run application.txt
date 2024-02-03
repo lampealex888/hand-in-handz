@@ -1,0 +1,35 @@
+Steps to run application
+1. Install Python version 3.7! (must be 3.7 for mediapipe to work)
+https://www.python.org/downloads/release/python-370/
+2. Add Python to your sytem variables
+https://realpython.com/add-python-to-path/
+3. Make sure to check if you are using the correct version using
+```
+python --version
+```
+4. Install virtualenv (if not already installed)
+```
+pip install virtualenv
+```
+5. Create a virtual environment
+```
+python3 -m venv env
+```
+6. Run the virtual environment
+Mac:
+```
+source env/bin/activate
+```
+Windows:
+```
+env/Scripts/activate.bat //In CMD
+env/Scripts/Activate.ps1 //In Powershell
+```
+7. Check if the virtual environment is working
+```
+pip list
+```
+8. Install the required dependencies
+```
+pip install opencv-python pycaw pyautogui autopy mediapipe numpy
+```

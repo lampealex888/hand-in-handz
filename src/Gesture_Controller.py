@@ -545,6 +545,17 @@ class GestureController:
             GestureController.hr_major = left
             GestureController.hr_minor = right
 
+    def display_text_overlay(self, image, text):
+        """Display text overlay on the video feed."""
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        font_scale = 0.7
+        font_color = (255, 255, 255)  # White color
+        line_thickness = 2
+        text_size = cv2.getTextSize(text, font, font_scale, line_thickness)[0]
+        text_x = (image.shape[1] - text_size[0]) // 2
+        text_y = image.shape[0] - 30
+        cv2.putText(image, text, (text_x, text_y), font, font_scale, font_color, line_thickness)
+
     def start(self):
         """
         Entry point of whole programm, caputres video frame and passes, obtains
@@ -584,13 +595,28 @@ class GestureController:
                     else:
                         gest_name = handmajor.get_gesture()
                         Controller.handle_controls(gest_name, handmajor.hand_result)
+                        if gest_name == Gest.PALM:
+                            self.display_text_overlay(image, "Neutral Gesture")
+                        elif gest_name == Gest.V_GEST:
+                            self.display_text_overlay(image, "Mouse Cursor")
+                        elif gest_name == Gest.MID:
+                            self.display_text_overlay(image, "Left Click")
+                        elif gest_name == Gest.INDEX:
+                            self.display_text_overlay(image, "Right Click")
+                        elif gest_name == Gest.TWO_FINGER_CLOSED:
+                            self.display_text_overlay(image, "Double Click")
+                        elif gest_name == Gest.TWO_FINGER_CLOSED:   
+                            self.display_text_overlay(image, "Double Click")
+                        elif gest_name == Gest.FIST:
+                            self.display_text_overlay(image, "Selecting/Dragging")
                     
                     for hand_landmarks in results.multi_hand_landmarks:
                         mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
                 else:
                     Controller.prev_hand = None
                 cv2.imshow('Gesture Controller', image)
-                if cv2.waitKey(5) & 0xFF == 13:
+                # Press 'Esc' to exit
+                if cv2.waitKey(5) & 0xFF == 27:
                     break
         GestureController.cap.release()
         cv2.destroyAllWindows()

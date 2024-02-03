@@ -1,0 +1,27 @@
+#!pip install tflite-runtime
+import tflite_runtime.interpreter as tflite
+import json
+import pandas as pd
+import numpy as np
+import pyautogui
+class ASL_Model:
+    REQUIRED_SIGNATURE = "serving_default"
+    REQUIRED_OUTPUT = "outputs"
+    def __init__(self):
+        selected_columns=json.load(open("/kaggle/input/asl1stplacekaggleupload/tflite/0/1/inference_args.json"))['selected_columns']
+        interpreter = tflite.Interpreter("/kaggle/input/asl1stplacekaggleupload/tflite/0/1/model.tflite")
+        with open ("/kaggle/input/asl-fingerspelling/character_to_prediction_index.json", "r") as f:
+            character_map = json.load(f)
+        self.rev_character_map = {j:i for i,j in character_map.items()}
+
+
+        self.prediction_fn = interpreter.get_signature_runner("serving_default")
+
+       
+    def predict(self,landmarks):#takes input from MediaPipe holistic
+        landmarks = landmarks[self.selected_columns]
+        output = self.prediction_fn(inputs=landmarks)
+        prediction_str = "".join([self.rev_character_map.get(s, "") for s in np.argmax(output[self.REQUIRED_OUTPUT], axis=1)])
+        if prediction_str == '2 a-e -aroe':#then confidence is too low or there are < 15 frames ideally this would be replaced but ...
+            return None#Failure
+        return prediction_str

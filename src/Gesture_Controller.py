@@ -10,10 +10,13 @@ from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 from google.protobuf.json_format import MessageToDict
 import screen_brightness_control as sbcontrol
+import pandas as pd
+import ASL_Fingerspelling
 
 pyautogui.FAILSAFE = False
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
+mp_holistic = mp.solutions.holistic
 
 # Gesture Encodings 
 class Gest(IntEnum):
@@ -555,17 +558,21 @@ class GestureController:
         handmajor = HandRecog(HLabel.MAJOR)
         handminor = HandRecog(HLabel.MINOR)
 
-        with mp_hands.Hands(max_num_hands = 2,min_detection_confidence=0.5, min_tracking_confidence=0.5) as hands:
+        entering_phrase=False
+        phrase_buffer = []
+        asl_model=ASL_Fingerspelling.ASL_Model()
+        
+        with mp_hands.Hands(max_num_hands = 2,min_detection_confidence=0.5, min_tracking_confidence=0.5) as hands,\
+             mp_holistic.Holistic(static_image_mode=False,model_complexity=2,enable_segmentation=True,refine_face_landmarks=True) as holistic:
             while GestureController.cap.isOpened() and GestureController.gc_mode:
                 success, image = GestureController.cap.read()
-
                 if not success:
                     print("Ignoring empty camera frame.")
                     continue
-                
                 image = cv2.cvtColor(cv2.flip(image, 1), cv2.COLOR_BGR2RGB)
                 image.flags.writeable = False
                 results = hands.process(image)
+
                 
                 image.flags.writeable = True
                 image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
@@ -578,8 +585,10 @@ class GestureController:
                     handmajor.set_finger_state()
                     handminor.set_finger_state()
                     gest_name = handminor.get_gesture()
+                    if gest_name == Gest.PINKY:
+                        entering_phrase=not entering_phrase
 
-                    if gest_name == Gest.PINCH_MINOR:
+                    elif gest_name == Gest.PINCH_MINOR:
                         Controller.handle_controls(gest_name, handminor.hand_result)
                     else:
                         gest_name = handmajor.get_gesture()
@@ -589,6 +598,21 @@ class GestureController:
                         mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
                 else:
                     Controller.prev_hand = None
+                    
+                
+                
+                if entering_phrase:
+                    phrase_buffer.append(holistic.process(image))
+                elif len(phrase_buffer>15):  
+                    t={column:[] for column in asl_model.selected_columns}
+                    for k,v in t.items():
+                        var,landmark_type,landmark_index=k.split('_')
+                        for phrase in phrase_buffer:
+                            v.append(phrase.getattr(landmark_type).landmark[landmark_index].getattr(var))
+                    text_output=asl_model.predict(pd.from_dict(t))
+                    phrase_buffer=[]
+                    pyautogui.write(text_output)
+                    
                 cv2.imshow('Gesture Controller', image)
                 if cv2.waitKey(5) & 0xFF == 13:
                     break

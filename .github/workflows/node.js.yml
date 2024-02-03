@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      NEXT_PUBLIC_BASE_PATH: /hand-gesture-recognition-using-mediapipe-in-react
+      NEXT_PUBLIC_BASE_PATH: /hand-in-handz
 
     strategy:
       matrix:

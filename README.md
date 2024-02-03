@@ -1,26 +1,52 @@
-# This is an implementation of the repo:
+# Getting Started
 
-https://github.com/Kazuhito00/hand-gesture-recognition-using-mediapipe
+  ### Pre-requisites
+  
+  Python: (3.8.5)<br>
+  Anaconda Distribution: To download click [here](https://www.anaconda.com/products/individual).
+  
+  ### Procedure
 
-but in React, and nextJS.
-The working demo is deployed in here https://tomasgonzalez.github.io/hand-gesture-recognition-using-mediapipe-in-react/ .
-
-https://user-images.githubusercontent.com/26396804/198848050-095785e7-9a83-444d-91d0-f432eb21a4a4.mp4
-
-I made It because I need it for another project, and thought that It would be a good idea to upload it in this rough form just in case It helps anyone.
-
-## To convert the hdf5 model to tfjs you can use the [tensorflowjs_converter](https://www.tensorflow.org/js/guide/conversion) CLI following command: 
-tensorflowjs_converter --input_format keras --output_format tfjs_graph_model model/keypoint_classifier/keypoint_classifier.hdf5 tfjs_model/
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-yarn dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-## Warning
-This project originally was build in `NEXTJS` I migrated it to vite because of `SSR` issues, It should be working now. Although the github pages `CI` Pipeline is not working and also I removed the env variables for the `public` dir prefix so you will have to add it in order to load the gesture recognition model.
+  Step 1: 
+  ```bash
+  conda create --name gest python=3.8.5
+  ```
+  
+  Step 2:
+  ```bash
+  conda activate gest
+  ```
+  
+  Step 3:
+  ```bash
+  pip install -r requirements.txt
+  ```
+  
+  Step 4:
+  ```bash 
+  conda install PyAudio
+  ```
+  ```bash 
+  conda install pywin32
+  ```
+  
+  Step 5:
+  ``` 
+  cd to the GitHub Repo till src folder
+  ```
+  Command may look like: `cd C:\Users\.....\Gesture-Controlled-Virtual-Mouse\src`
+  
+  Step 6:
+  
+  For running Voice Assistant:
+  ```bash 
+  python Proton.py
+  ```
+  ( You can enable Gesture Recognition by using the command "Proton Launch Gesture Recognition" )
+  
+  Or to run only Gesture Recognition without the voice assisstant:
+  
+  Uncomment last 2 lines of Code in the file `Gesture_Controller.py`
+  ```bash 
+  python Gesture_Controller.py
+  ```
